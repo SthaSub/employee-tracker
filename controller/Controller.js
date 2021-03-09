@@ -123,4 +123,11 @@ module.exports = class Controller{
             })
 
     }
+
+    addDepartment() {
+        inquirer.prompt(departmentQues)
+            .then((answer) => {
+                this.executeTheQuery(queries.addDepartment, answer.department, "insert");
+            });
+    }
 }
