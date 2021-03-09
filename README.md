@@ -35,10 +35,13 @@
   ## Screenshot
   ### Startup Screen
   ![welocome](./public/assets/images/welcome.PNG)
+
   ### Department 
   ![departmentView](./public/assets/images/deparmtent.PNG)
+  
   ### Employee by Manager 
   ![managerView](./public/assets/images/manager.PNG)
+  
   ### All Employee
   ![AllEmployeeView](./public/assets/images/view.PNG)
   
