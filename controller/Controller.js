@@ -251,7 +251,7 @@ module.exports = class Controller{
     updateEmployeeManager() {
         this.updateOperation("manager");
     }
-    
+
     updateRole(staffId, roles){
         inquirer.prompt([{
             name: "role",
@@ -297,5 +297,38 @@ module.exports = class Controller{
                 this.executeTheQuery(queries.updateEmployeeManager, [empManagerId, staffId], "update");
             })
     }
+
+
+  /**
+   *  */
+   viewallDepartments() {
+    this.executeTheQuery(queries.viewallDepartments);
+}
+
+viewallRole() {
+    this.executeTheQuery(queries.viewallRole);
+}
+
+async executeTheQuery(query) {
+    this.executeTheQuery(query, []);
+}
+
+async executeTheQuery(query, parameter) {
+    this.executeTheQuery(query, parameter, "None");
+}
+
+async executeTheQuery(query, parameter, queryType) {
+    try {
+        let result;
+        result = await this.connection.dbQuery(query, parameter);
+        if (queryType == "insert" || queryType == "update" || queryType == "delete")
+            console.log("OK!");
+        else
+            console.table(result);
+        this.welcome();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 }
