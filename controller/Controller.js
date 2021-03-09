@@ -332,6 +332,40 @@ showEmployeeDepartment(departments){
         this.executeTheQuery(queries.viewallEmployeesbyDepartment, answer.department);
     });
 }
+
+viewallEmployeesbyManager() {
+    let managers = new Array();
+    this.connection.dbQuery(queries.listOfManagers).then((result) => {
+        result.forEach(element => {
+            managers.push(element.manager);
+        });
+        return result;
+    }).then((managerResult) => {
+        this.managerSelction(managers, managerResult);
+    });
+
+}
+
+managerSelction(list, managerResult) {
+    inquirer.prompt([{
+        name: "role",
+        type: "list",
+        message: "Which manager's employees you want to view?",
+        choices: list
+    }]).then((select) => {
+        let queryID;
+        managerResult.forEach((res) => {
+            if (select.role == res.manager) {
+                queryID = res.id;
+            }
+        });
+        return queryID;
+    }
+    ).then((id) => {
+        this.executeTheQuery(queries.viewallEmployeesbyManager, id);
+    });
+}
+
 async executeTheQuery(query) {
     this.executeTheQuery(query, []);
 }
