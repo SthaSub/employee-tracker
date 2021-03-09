@@ -43,5 +43,52 @@ const employeeQues = [{
 
 
 module.exports = class Controller{
-    
+    constructor() {
+        this.welcome();
+        this.connection = new Database();
+    }
+    welcome() {
+        inquirer.prompt(question)
+            .then((res) => {
+                switch (res.selection) {
+                    case "View all Employees":
+                        this.viewAllEMployee();
+                        break;
+                    case "View all Employees by Department":
+                        this.viewallEmployeesbyDepartment();
+                        break;
+                    case "View all Departments":
+                        this.viewallDepartments();
+                        break;
+                    case "View all Employees by Manager":
+                        this.viewallEmployeesbyManager();
+                        break;
+                    case "View all Roles":
+                        this.viewallRole();
+                        break;
+                    case "Add Employee":
+                        this.addEmployee();
+                        break;
+                    case "Add Department":
+                        this.addDepartment();
+                        break;
+                    case "Add Role":
+                        this.addRole();
+                        break;
+                    case "Update Employee Role":
+                        this.updateEmployeeRole();
+                        break;
+                    case "Remove Employee":
+                        this.removeEmployee();
+                        break;
+                    case "Update Employee Manager":
+                        this.updateEmployeeManager();
+                        break;
+                    default:
+                        this.exit();
+                        break;
+                }
+            });
+    }
+
 }
