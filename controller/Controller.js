@@ -2,8 +2,11 @@
 const inquirer = require("inquirer");
 require("console.table"); // console.table for SQL
 const Database = require("../database/DatabaseConnection");
-const queries = require("../utilites/query");
+const queries = require("../utilites/query"); // required queries from query.js
 
+/**
+ * start up question for user
+ */
 const question = [{
     type: "list",
     name: "selection",
@@ -24,29 +27,24 @@ const question = [{
     ]
 }];
 
+/**
+ * department name input
+ */
 const departmentQues = [{
     name: "department",
     type: "input",
     message: "Enter your department name."
 }];
 
-const employeeQues = [{
-    name: "firstName",
-    type: "input",
-    message: "Enter your first name"
-},
-{
-    name: "firstName",
-    type: "input",
-    message: "Enter your first name"
-}];
-
-
 module.exports = class Controller{
     constructor() {
         this.welcome();
         this.connection = new Database();
     }
+
+    /**
+     * Welcome screen questions
+     */
     welcome() {
         inquirer.prompt(question)
             .then((res) => {
@@ -92,12 +90,15 @@ module.exports = class Controller{
 
     }
 
+    /**
+     * Add employee into database
+     */
     addEmployee() {
         let departmentOption = new Array();
         this.connection.dbQuery(queries.viewallDepartments)
             .then((result) => {
                 result.forEach(element => {
-                    departmentOption.push(element.name);
+                    departmentOption.push(element.name); //getting all department name and set into array
                 });
                 inquirer.prompt([{
                     name: "department",
@@ -114,6 +115,10 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * gets the role id and title and pass to get manager function
+     * 
+     */
     getEmployeeRoles(result) {
         let employeeRoles = new Array();
         this.connection.dbQuery(queries.getRoleId, result[0].id)
@@ -134,6 +139,10 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * 
+     * gets the manager id and pass both manage id and role id to save employee function 
+     */
     getManagers(roleId) {
         this.connection.dbQuery(queries.getmanagers)
             .then((result) => {
@@ -156,6 +165,10 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * save to database employee's name (fistname and lastname), role id and manager id 
+     */
+
     saveEmployee(roleId, managerId) {
         inquirer.prompt([{
             name: "firstName",
@@ -171,6 +184,10 @@ module.exports = class Controller{
                 this.executeTheQuery(queries.addEmployee, [answers.firstName, answers.lastName, roleId, managerId], "insert");
             })
     }
+
+    /**
+     * creates new role and add to database
+     */
     addRole() {
         let departments = new Array();
         this.connection.dbQuery(queries.viewallDepartments)
@@ -203,6 +220,9 @@ module.exports = class Controller{
 
     }
 
+    /**
+     * creates new and add department into database 
+     */
     addDepartment() {
         inquirer.prompt(departmentQues)
             .then((answer) => {
@@ -210,11 +230,23 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * --------------------------------------------
+     * UPDATE OPERATION
+     * --------------------------------------------
+     */
 
+    /**
+     * updates the employee role
+     */
     updateEmployeeRole() {
         this.updateOperation("role");
     }
 
+    /**
+     * 
+     * performs the update operation both manager and role updeted depends upon the function argument 
+     */
     updateOperation(operationType) {
         let employees = new Array();
         let query = (operationType == "manager") ? queries.getNonManagerEmployee : queries.getAllEmployee;
@@ -228,6 +260,10 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * 
+     * gets the employee id and pass to update role function 
+     */
     getRoles(employees) {
         inquirer.prompt({
             name: "employee",
@@ -248,10 +284,16 @@ module.exports = class Controller{
 
     }
 
+    /**
+     * updates the employee's manager
+     */
     updateEmployeeManager() {
         this.updateOperation("manager");
     }
 
+    /**
+     * updates the role of employee 
+     */
     updateRole(staffId, roles){
         inquirer.prompt([{
             name: "role",
@@ -265,6 +307,10 @@ module.exports = class Controller{
             });
     }
 
+    /**
+     * 
+     * gets the employee manager for update 
+     */
     getEmployees(employees) {
         inquirer.prompt({
             name: "employee",
@@ -285,6 +331,9 @@ module.exports = class Controller{
             })
     }
 
+    /**
+     * gets the manager_id and managers and updates the employee 
+     */
     getStaffAsManager(staffId, managers) {
         inquirer.prompt([{
             name: "manager",
@@ -298,17 +347,29 @@ module.exports = class Controller{
             })
     }
 
+    /**
+     * ---------------------------------------------
+     * VIEW OPERATION
+     * ---------------------------------------------
+     */
 
-  /**
-   *  */
+    /**
+     * shows the all departments
+     */
 viewallDepartments() {
     this.executeTheQuery(queries.viewallDepartments);
 }
 
+/**
+ * shows the all roles and its attributes
+ */
 viewallRole() {
     this.executeTheQuery(queries.viewallRole);
 }
 
+/**
+ * shows the employee by department belongs
+ */
 viewallEmployeesbyDepartment() {
     let departments = new Array();
     this.connection.dbQuery(queries.viewallDepartments)
@@ -320,6 +381,10 @@ viewallEmployeesbyDepartment() {
     });
 }
 
+/**
+ * 
+ * shows the selected department employee 
+ */
 showEmployeeDepartment(departments){
     inquirer.prompt([{
         name:"department",
@@ -332,10 +397,16 @@ showEmployeeDepartment(departments){
     });
 }
 
+/**
+ * shows all attributes of employee including salary, roles, manager, full name, department
+ */
 viewAllEMployee() {
     this.executeTheQuery(queries.viewAllEMployee);
 }
 
+/**
+ * shows all employee by managers
+ */
 viewallEmployeesbyManager() {
     let managers = new Array();
     this.connection.dbQuery(queries.listOfManagers).then((result) => {
@@ -349,6 +420,9 @@ viewallEmployeesbyManager() {
 
 }
 
+/**
+ * displays the employees of manager  
+ */
 managerSelction(list, managerResult) {
     inquirer.prompt([{
         name: "role",
@@ -371,7 +445,7 @@ managerSelction(list, managerResult) {
 
 
 /**
- * 
+ * deletes the employee from database
  */
 
  async removeEmployee() {
@@ -379,6 +453,10 @@ managerSelction(list, managerResult) {
     await this.deleteEmployee(result); 
 }
 
+/**
+ * 
+ * deletes the selected employee 
+ */
 async deleteEmployee(result){
     let staffs = new Array();
     result.forEach(element=>{
@@ -396,10 +474,17 @@ async deleteEmployee(result){
     })
 }
 
+/**
+ * exits query operation by closing database connection and terminating program 
+ */
 async exit() {
     await this.connection.dbClose();
 }
 
+/**
+ * 
+ * executes the query pass by different functions 
+ */
 async executeTheQuery(query) {
     this.executeTheQuery(query, []);
 }

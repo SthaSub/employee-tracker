@@ -18,6 +18,9 @@ module.exports = class Database{
         });
     }
 
+    /**
+     * executes the query pass the resolve promise
+     */
     dbQuery(statement, parameter){
         return new Promise((resolve,reject)=>{
             this.connection.query(statement, parameter, (err, res)=>{
@@ -26,6 +29,10 @@ module.exports = class Database{
             });
         })
     }
+
+    /**
+     * close the database connection
+     */
     dbClose(){
         return new Promise((resolve, reject)=>{
             resolve(this.connection.end());
