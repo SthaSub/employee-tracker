@@ -333,6 +333,10 @@ showEmployeeDepartment(departments){
     });
 }
 
+viewAllEMployee() {
+    this.executeTheQuery(queries.viewAllEMployee);
+}
+
 viewallEmployeesbyManager() {
     let managers = new Array();
     this.connection.dbQuery(queries.listOfManagers).then((result) => {
