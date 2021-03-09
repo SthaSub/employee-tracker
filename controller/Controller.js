@@ -114,7 +114,63 @@ module.exports = class Controller{
             });
     }
 
+    getEmployeeRoles(result) {
+        let employeeRoles = new Array();
+        this.connection.dbQuery(queries.getRoleId, result[0].id)
+            .then((roles) => {
+                roles.forEach(element => {
+                    employeeRoles.push(element.id + " - " + element.title);
+                });
+                inquirer.prompt([{
+                    name: "roles",
+                    type: "list",
+                    message: "select role for employee",
+                    choices: employeeRoles
+                }])
+                    .then((answer) => {
+                        let roleId = answer.roles.split(" - ")[0];
+                        this.getManagers(roleId);
+                    });
+            });
+    }
 
+    getManagers(roleId) {
+        this.connection.dbQuery(queries.getmanagers)
+            .then((result) => {
+                let managers = new Array();
+                result.forEach(element => {
+                    managers.push(element.id + " - " + element.manager);
+                });
+                managers.push("None");
+                inquirer.prompt([{
+                    name: "manager",
+                    type: "list",
+                    message: "select manager",
+                    choices: managers
+                }])
+                    .then((answer) => {
+                        let managerId = answer.manager == "None"? null:answer.manager.split(" - ")[0];
+                        console.log(managerId);
+                        this.saveEmployee(roleId, managerId);
+                    })
+            });
+    }
+
+    saveEmployee(roleId, managerId) {
+        inquirer.prompt([{
+            name: "firstName",
+            message: "Enter your first name",
+            type: "input"
+        },
+        {
+            name: "lastName",
+            message: "Enter your last name",
+            type: "input"
+        }])
+            .then((answers) => {
+                this.executeTheQuery(queries.addEmployee, [answers.firstName, answers.lastName, roleId, managerId], "insert");
+            })
+    }
     addRole() {
         let departments = new Array();
         this.connection.dbQuery(queries.viewallDepartments)
