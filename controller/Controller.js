@@ -370,6 +370,10 @@ managerSelction(list, managerResult) {
     });
 }
 
+async exit() {
+    await this.connection.dbClose();
+}
+
 async executeTheQuery(query) {
     this.executeTheQuery(query, []);
 }
