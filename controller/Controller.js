@@ -369,6 +369,33 @@ managerSelction(list, managerResult) {
     });
 }
 
+
+/**
+ * 
+ */
+
+ async removeEmployee() {
+    let result = await this.connection.dbQuery(queries.viewAllEMployee);
+    await this.deleteEmployee(result); 
+}
+
+async deleteEmployee(result){
+    let staffs = new Array();
+    result.forEach(element=>{
+        staffs.push(element.id+" - "+element.name);
+    });
+    inquirer.prompt([{
+        name:"staff",
+        choices:staffs,
+        message:"Which employee you want to remove?",
+        type:"list"
+    }])
+    .then((answer)=>{
+        let dId = answer.staff.split(" - ")[0];
+        this.executeTheQuery(queries.deleteEmployee,dId,"delete");
+    })
+}
+
 async exit() {
     await this.connection.dbClose();
 }
