@@ -92,6 +92,29 @@ module.exports = class Controller{
 
     }
 
+    addEmployee() {
+        let departmentOption = new Array();
+        this.connection.dbQuery(queries.viewallDepartments)
+            .then((result) => {
+                result.forEach(element => {
+                    departmentOption.push(element.name);
+                });
+                inquirer.prompt([{
+                    name: "department",
+                    type: "list",
+                    message: "choose department",
+                    choices: departmentOption
+                }])
+                    .then((answer) => {
+                        this.connection.dbQuery(queries.getDepartmentId, answer.department)
+                            .then((result) => {
+                                this.getEmployeeRoles(result);
+                            });
+                    })
+            });
+    }
+
+
     addRole() {
         let departments = new Array();
         this.connection.dbQuery(queries.viewallDepartments)
