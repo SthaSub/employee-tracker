@@ -14,7 +14,7 @@ module.exports = class Database{
         this.connection = mysql.createConnection(config);
         this.connection.connect((err)=>{
             if (err) throw err;
-            else console.log("connect");
+            // else console.log("connect");
         });
     }
 
