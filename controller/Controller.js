@@ -89,6 +89,38 @@ module.exports = class Controller{
                         break;
                 }
             });
+
     }
 
+    addRole() {
+        let departments = new Array();
+        this.connection.dbQuery(queries.viewallDepartments)
+            .then((res) => {
+                res.forEach(element => {
+                    departments.push(element.name);
+                });
+                inquirer.prompt([
+                    {
+                        name: "departmentName",
+                        type: "list",
+                        message: "Enter department Name",
+                        choices: departments
+                    }, {
+                        name: "roleName",
+                        type: "input",
+                        message: "Enter your role name."
+                    }, {
+                        name: "salary",
+                        type: "input",
+                        message: "Enter role salary"
+                    }])
+                    .then((answer) => {
+                        this.connection.dbQuery(queries.getDepartmentId, answer.departmentName)
+                            .then((res) => {
+                                this.executeTheQuery(queries.addRole, [answer.roleName, answer.salary, res[0].id], "insert");
+                            });
+                    });
+            })
+
+    }
 }
