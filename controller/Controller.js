@@ -209,4 +209,23 @@ module.exports = class Controller{
                 this.executeTheQuery(queries.addDepartment, answer.department, "insert");
             });
     }
+
+
+    updateEmployeeRole() {
+        this.updateOperation("role");
+    }
+
+    updateOperation(operationType) {
+        let employees = new Array();
+        let query = (operationType == "manager") ? queries.getNonManagerEmployee : queries.getAllEmployee;
+        this.connection.dbQuery(query)
+            .then((result) => {
+                result.forEach(element => {
+                    employees.push(element.id + " - " + element.employee);
+                });
+                if (operationType == "manager") this.getEmployees(employees);
+                else this.getRoles(employees);
+            });
+    }
+
 }
