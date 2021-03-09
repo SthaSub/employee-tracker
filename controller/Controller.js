@@ -228,4 +228,74 @@ module.exports = class Controller{
             });
     }
 
+    getRoles(employees) {
+        inquirer.prompt({
+            name: "employee",
+            message: "Which employee's role you want to update?",
+            type: "list",
+            choices: employees
+        }).then((answer) => {
+            let staff = answer.employee.split(" - ")[0];
+            let roles = new Array();
+            this.connection.dbQuery(queries.getRoles)
+                .then((result) => {
+                    result.forEach(element => {
+                        roles.push(element.id + " - " + element.title);
+                    });
+                    this.updateRole(staff,roles);
+                });
+        });
+
+    }
+
+    updateEmployeeManager() {
+        this.updateOperation("manager");
+    }
+    
+    updateRole(staffId, roles){
+        inquirer.prompt([{
+            name: "role",
+            message: "Which role you want to assign?",
+            type: "list",
+            choices: roles
+        }])
+            .then((answer) => {
+                let role_id = answer.role.split(" - ")[0];
+                this.executeTheQuery(queries.updateEmployeeRole,[role_id, staffId],"update");
+            });
+    }
+
+    getEmployees(employees) {
+        inquirer.prompt({
+            name: "employee",
+            message: "Which employee's manager you want to update?",
+            type: "list",
+            choices: employees
+        })
+            .then(answer => {
+                let staffId = answer.employee.split(" - ")[0];
+                let managers = new Array();
+                this.connection.dbQuery(queries.getmanagers)
+                    .then((result) => {
+                        result.forEach(element => {
+                            managers.push(element.id + " - " + element.manager);
+                        });
+                        this.getStaffAsManager(staffId, managers);
+                    });
+            })
+    }
+
+    getStaffAsManager(staffId, managers) {
+        inquirer.prompt([{
+            name: "manager",
+            type: "list",
+            message: "Which manager you want to assign?",
+            choices: managers
+        }])
+            .then((answer) => {
+                let empManagerId = answer.manager.split(" - ")[0];
+                this.executeTheQuery(queries.updateEmployeeManager, [empManagerId, staffId], "update");
+            })
+    }
+
 }
