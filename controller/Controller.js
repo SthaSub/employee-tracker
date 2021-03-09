@@ -313,7 +313,6 @@ viewallEmployeesbyDepartment() {
     let departments = new Array();
     this.connection.dbQuery(queries.viewallDepartments)
     .then((result)=>{
-        console.log(result);
         result.forEach(element=>{
             departments.push(element.name);
         });
