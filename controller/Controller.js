@@ -36,7 +36,7 @@ const departmentQues = [{
     message: "Enter your department name."
 }];
 
-module.exports = class Controller{
+module.exports = class Controller {
     constructor() {
         this.welcome();
         this.connection = new Database();
@@ -158,7 +158,7 @@ module.exports = class Controller{
                     choices: managers
                 }])
                     .then((answer) => {
-                        let managerId = answer.manager == "None"? null:answer.manager.split(" - ")[0];
+                        let managerId = answer.manager == "None" ? null : answer.manager.split(" - ")[0];
                         console.log(managerId);
                         this.saveEmployee(roleId, managerId);
                     })
@@ -278,7 +278,7 @@ module.exports = class Controller{
                     result.forEach(element => {
                         roles.push(element.id + " - " + element.title);
                     });
-                    this.updateRole(staff,roles);
+                    this.updateRole(staff, roles);
                 });
         });
 
@@ -294,7 +294,7 @@ module.exports = class Controller{
     /**
      * updates the role of employee 
      */
-    updateRole(staffId, roles){
+    updateRole(staffId, roles) {
         inquirer.prompt([{
             name: "role",
             message: "Which role you want to assign?",
@@ -303,7 +303,7 @@ module.exports = class Controller{
         }])
             .then((answer) => {
                 let role_id = answer.role.split(" - ")[0];
-                this.executeTheQuery(queries.updateEmployeeRole,[role_id, staffId],"update");
+                this.executeTheQuery(queries.updateEmployeeRole, [role_id, staffId], "update");
             });
     }
 
@@ -356,155 +356,155 @@ module.exports = class Controller{
     /**
      * shows the all departments
      */
-viewallDepartments() {
-    this.executeTheQuery(queries.viewallDepartments);
-}
+    viewallDepartments() {
+        this.executeTheQuery(queries.viewallDepartments);
+    }
 
-/**
- * shows the all roles and its attributes
- */
-viewallRole() {
-    this.executeTheQuery(queries.viewallRole);
-}
+    /**
+     * shows the all roles and its attributes
+     */
+    viewallRole() {
+        this.executeTheQuery(queries.viewallRole);
+    }
 
-/**
- * shows the employee by department belongs
- */
-viewallEmployeesbyDepartment() {
-    let departments = new Array();
-    this.connection.dbQuery(queries.viewallDepartments)
-    .then((result)=>{
-        result.forEach(element=>{
-            departments.push(element.name);
+    /**
+     * shows the employee by department belongs
+     */
+    viewallEmployeesbyDepartment() {
+        let departments = new Array();
+        this.connection.dbQuery(queries.viewallDepartments)
+            .then((result) => {
+                result.forEach(element => {
+                    departments.push(element.name);
+                });
+                this.showEmployeeDepartment(departments);
+            });
+    }
+
+    /**
+     * 
+     * shows the selected department employee 
+     */
+    showEmployeeDepartment(departments) {
+        inquirer.prompt([{
+            name: "department",
+            type: "list",
+            message: "Which department's employee you want to view?",
+            choices: departments
+        }])
+            .then((answer) => {
+                this.executeTheQuery(queries.viewallEmployeesbyDepartment, answer.department);
+            });
+    }
+
+    /**
+     * shows all attributes of employee including salary, roles, manager, full name, department
+     */
+    viewAllEMployee() {
+        this.executeTheQuery(queries.viewAllEMployee);
+    }
+
+    /**
+     * shows all employee by managers
+     */
+    viewallEmployeesbyManager() {
+        let managers = new Array();
+        this.connection.dbQuery(queries.listOfManagers).then((result) => {
+            result.forEach(element => {
+                managers.push(element.manager);
+            });
+            return result;
+        }).then((managerResult) => {
+            this.managerSelction(managers, managerResult);
         });
-        this.showEmployeeDepartment(departments);
-    });
-}
 
-/**
- * 
- * shows the selected department employee 
- */
-showEmployeeDepartment(departments){
-    inquirer.prompt([{
-        name:"department",
-        type:"list",
-        message:"Which department's employee you want to view?",
-        choices:departments
-    }])
-    .then((answer)=>{
-        this.executeTheQuery(queries.viewallEmployeesbyDepartment, answer.department);
-    });
-}
+    }
 
-/**
- * shows all attributes of employee including salary, roles, manager, full name, department
- */
-viewAllEMployee() {
-    this.executeTheQuery(queries.viewAllEMployee);
-}
+    /**
+     * displays the employees of manager  
+     */
+    managerSelction(list, managerResult) {
+        inquirer.prompt([{
+            name: "role",
+            type: "list",
+            message: "Which manager's employees you want to view?",
+            choices: list
+        }]).then((select) => {
+            let queryID;
+            managerResult.forEach((res) => {
+                if (select.role == res.manager) {
+                    queryID = res.id;
+                }
+            });
+            return queryID;
+        }
+        ).then((id) => {
+            this.executeTheQuery(queries.viewallEmployeesbyManager, id);
+        });
+    }
 
-/**
- * shows all employee by managers
- */
-viewallEmployeesbyManager() {
-    let managers = new Array();
-    this.connection.dbQuery(queries.listOfManagers).then((result) => {
+
+    /**
+     * deletes the employee from database
+     */
+
+    async removeEmployee() {
+        let result = await this.connection.dbQuery(queries.viewAllEMployee);
+        await this.deleteEmployee(result);
+    }
+
+    /**
+     * 
+     * deletes the selected employee 
+     */
+    async deleteEmployee(result) {
+        let staffs = new Array();
         result.forEach(element => {
-            managers.push(element.manager);
+            staffs.push(element.id + " - " + element.name);
         });
-        return result;
-    }).then((managerResult) => {
-        this.managerSelction(managers, managerResult);
-    });
-
-}
-
-/**
- * displays the employees of manager  
- */
-managerSelction(list, managerResult) {
-    inquirer.prompt([{
-        name: "role",
-        type: "list",
-        message: "Which manager's employees you want to view?",
-        choices: list
-    }]).then((select) => {
-        let queryID;
-        managerResult.forEach((res) => {
-            if (select.role == res.manager) {
-                queryID = res.id;
-            }
-        });
-        return queryID;
+        inquirer.prompt([{
+            name: "staff",
+            choices: staffs,
+            message: "Which employee you want to remove?",
+            type: "list"
+        }])
+            .then((answer) => {
+                let dId = answer.staff.split(" - ")[0];
+                this.executeTheQuery(queries.deleteEmployee, dId, "delete");
+            })
     }
-    ).then((id) => {
-        this.executeTheQuery(queries.viewallEmployeesbyManager, id);
-    });
-}
 
-
-/**
- * deletes the employee from database
- */
-
- async removeEmployee() {
-    let result = await this.connection.dbQuery(queries.viewAllEMployee);
-    await this.deleteEmployee(result); 
-}
-
-/**
- * 
- * deletes the selected employee 
- */
-async deleteEmployee(result){
-    let staffs = new Array();
-    result.forEach(element=>{
-        staffs.push(element.id+" - "+element.name);
-    });
-    inquirer.prompt([{
-        name:"staff",
-        choices:staffs,
-        message:"Which employee you want to remove?",
-        type:"list"
-    }])
-    .then((answer)=>{
-        let dId = answer.staff.split(" - ")[0];
-        this.executeTheQuery(queries.deleteEmployee,dId,"delete");
-    })
-}
-
-/**
- * exits query operation by closing database connection and terminating program 
- */
-async exit() {
-    await this.connection.dbClose();
-}
-
-/**
- * 
- * executes the query pass by different functions 
- */
-async executeTheQuery(query) {
-    this.executeTheQuery(query, []);
-}
-
-async executeTheQuery(query, parameter) {
-    this.executeTheQuery(query, parameter, "None");
-}
-
-async executeTheQuery(query, parameter, queryType) {
-    try {
-        let result;
-        result = await this.connection.dbQuery(query, parameter);
-        if (queryType == "insert" || queryType == "update" || queryType == "delete")
-            console.log("OK!");
-        else
-            console.table(result);
-        this.welcome();
-    } catch (error) {
-        console.log(error);
+    /**
+     * exits query operation by closing database connection and terminating program 
+     */
+    async exit() {
+        await this.connection.dbClose();
     }
-}
+
+    /**
+     * 
+     * executes the query pass by different functions 
+     */
+    async executeTheQuery(query) {
+        this.executeTheQuery(query, []);
+    }
+
+    async executeTheQuery(query, parameter) {
+        this.executeTheQuery(query, parameter, "None");
+    }
+
+    async executeTheQuery(query, parameter, queryType) {
+        try {
+            let result;
+            result = await this.connection.dbQuery(query, parameter);
+            if (queryType == "insert" || queryType == "update" || queryType == "delete")
+                console.log("OK!");
+            else
+                console.table(result);
+            this.welcome();
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 }
