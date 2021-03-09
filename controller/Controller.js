@@ -301,7 +301,7 @@ module.exports = class Controller{
 
   /**
    *  */
-   viewallDepartments() {
+viewallDepartments() {
     this.executeTheQuery(queries.viewallDepartments);
 }
 
@@ -309,6 +309,29 @@ viewallRole() {
     this.executeTheQuery(queries.viewallRole);
 }
 
+viewallEmployeesbyDepartment() {
+    let departments = new Array();
+    this.connection.dbQuery(queries.viewallDepartments)
+    .then((result)=>{
+        console.log(result);
+        result.forEach(element=>{
+            departments.push(element.name);
+        });
+        this.showEmployeeDepartment(departments);
+    });
+}
+
+showEmployeeDepartment(departments){
+    inquirer.prompt([{
+        name:"department",
+        type:"list",
+        message:"Which department's employee you want to view?",
+        choices:departments
+    }])
+    .then((answer)=>{
+        this.executeTheQuery(queries.viewallEmployeesbyDepartment, answer.department);
+    });
+}
 async executeTheQuery(query) {
     this.executeTheQuery(query, []);
 }
