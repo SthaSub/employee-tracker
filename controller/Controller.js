@@ -42,3 +42,6 @@ const employeeQues = [{
 }];
 
 
+module.exports = class Controller{
+    
+}
