@@ -3,7 +3,7 @@ module.exports =  queries = {
                      LEFT JOIN employee m ON e.manager_id = m.id 
                      INNER JOIN role r ON e.role_id = r.id 
                      INNER JOIN department d ON r.department_id = d.id`,
-    viewallEmployeesbyDepartment: `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department 
+    viewallEmployeesbyDepartment: `SELECT e.id, e.first_name, e.last_name, r.title 
                                    FROM employee e LEFT JOIN role r ON e.role_id = r.id 
                                    INNER JOIN department d ON d.id = r.department_id WHERE d.name = ?`,
     viewallEmployeesbyManager: `SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager
